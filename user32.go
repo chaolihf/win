@@ -1758,6 +1758,7 @@ var (
 
 	// Functions
 	fillRect                    *windows.LazyProc
+	intersectRect               *windows.LazyProc
 	addClipboardFormatListener  *windows.LazyProc
 	adjustWindowRect            *windows.LazyProc
 	attachThreadInput           *windows.LazyProc
@@ -1909,6 +1910,8 @@ func init() {
 
 	// Functions
 	fillRect = libuser32.NewProc("FillRect")
+	intersectRect = libuser32.NewProc("IntersectRect")
+
 	addClipboardFormatListener = libuser32.NewProc("AddClipboardFormatListener")
 	adjustWindowRect = libuser32.NewProc("AdjustWindowRect")
 	attachThreadInput = libuser32.NewProc("AttachThreadInput")
@@ -2069,6 +2072,15 @@ func FillRect(hDC HDC, lprc *RECT, hbr HBRUSH) uint32 {
 		uintptr(hbr))
 
 	return uint32(ret)
+}
+
+func IntersectRect(lprcDst, lprcSrc1, lprcSrc2 *RECT) bool {
+	ret, _, _ := syscall.SyscallN(intersectRect.Addr(),
+		uintptr(unsafe.Pointer(lprcDst)),
+		uintptr(unsafe.Pointer(lprcSrc1)),
+		uintptr(unsafe.Pointer(lprcSrc2)))
+
+	return ret != 0
 }
 
 func AddClipboardFormatListener(hwnd HWND) bool {
