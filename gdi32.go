@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package win
@@ -1043,6 +1044,7 @@ var (
 	libmsimg32 *windows.LazyDLL
 
 	// Functions
+	createSolidBrush        *windows.LazyProc
 	abortDoc                *windows.LazyProc
 	addFontResourceEx       *windows.LazyProc
 	addFontMemResourceEx    *windows.LazyProc
@@ -1124,6 +1126,7 @@ func init() {
 	libmsimg32 = windows.NewLazySystemDLL("msimg32.dll")
 
 	// Functions
+	createSolidBrush = libgdi32.NewProc("CreateSolidBrush")
 	abortDoc = libgdi32.NewProc("AbortDoc")
 	addFontResourceEx = libgdi32.NewProc("AddFontResourceExW")
 	addFontMemResourceEx = libgdi32.NewProc("AddFontMemResourceEx")
@@ -1198,6 +1201,12 @@ func init() {
 	alphaBlend = libmsimg32.NewProc("AlphaBlend")
 	gradientFill = libmsimg32.NewProc("GradientFill")
 	transparentBlt = libmsimg32.NewProc("TransparentBlt")
+}
+
+func CreateSolidBrush(color COLORREF) HBRUSH {
+	ret, _, _ := syscall.SyscallN(createSolidBrush.Addr(),
+		uintptr(color))
+	return HBRUSH(ret)
 }
 
 func AbortDoc(hdc HDC) int32 {

@@ -2063,7 +2063,7 @@ func init() {
 }
 
 func FillRect(hDC HDC, lprc *RECT, hbr HBRUSH) uint32 {
-	ret, _, _ := syscall.SyscallN(fillRect.Addr(), 3,
+	ret, _, _ := syscall.SyscallN(fillRect.Addr(),
 		uintptr(hDC),
 		uintptr(unsafe.Pointer(lprc)),
 		uintptr(hbr))
