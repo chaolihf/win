@@ -1757,8 +1757,11 @@ var (
 	libuser32 *windows.LazyDLL
 
 	// Functions
-	fillRect                    *windows.LazyProc
-	intersectRect               *windows.LazyProc
+	fillRect      *windows.LazyProc
+	intersectRect *windows.LazyProc
+	enumWindows   *windows.LazyProc
+	getTopWindow  *windows.LazyProc
+
 	addClipboardFormatListener  *windows.LazyProc
 	adjustWindowRect            *windows.LazyProc
 	attachThreadInput           *windows.LazyProc
@@ -1911,6 +1914,8 @@ func init() {
 	// Functions
 	fillRect = libuser32.NewProc("FillRect")
 	intersectRect = libuser32.NewProc("IntersectRect")
+	enumWindows = libuser32.NewProc("EnumWindows")
+	getTopWindow = libuser32.NewProc("GetTopWindow")
 
 	addClipboardFormatListener = libuser32.NewProc("AddClipboardFormatListener")
 	adjustWindowRect = libuser32.NewProc("AdjustWindowRect")
@@ -2081,6 +2086,18 @@ func IntersectRect(lprcDst, lprcSrc1, lprcSrc2 *RECT) bool {
 		uintptr(unsafe.Pointer(lprcSrc2)))
 
 	return ret != 0
+}
+
+func EnumWindows(lpEnumFunc, lParam uintptr) bool {
+	ret, _, _ := syscall.SyscallN(enumWindows.Addr(),
+		lpEnumFunc, lParam)
+	return ret != 0
+}
+
+func GetTopWindow(hwnd HWND) HWND {
+	ret, _, _ := syscall.SyscallN(getTopWindow.Addr(),
+		uintptr(hwnd))
+	return HWND(ret)
 }
 
 func AddClipboardFormatListener(hwnd HWND) bool {
